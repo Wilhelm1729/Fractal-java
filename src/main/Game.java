@@ -32,6 +32,8 @@ public class Game extends Canvas implements Runnable {
 	long maxzoom = (long) Math.pow(10, 16);
 	int fr = 0;
 	
+	double log2 = Math.log(2);
+	
 	public Game() {
 		img = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 	}
@@ -84,6 +86,10 @@ public class Game extends Canvas implements Runnable {
 		
 	}
 	
+	public int linearInterpolation(int a, int b, double p) {
+		return a + (int) (p * (b - a));
+	}
+	
 	private void draw() {
 		zoom *= zoomStep;
 		fr++;
@@ -104,18 +110,52 @@ public class Game extends Canvas implements Runnable {
 				re = re * cos - im * sin;
 				im = sre * sin + im * cos;
 				
-				
 				re += c_re;
 				im += c_im;
 				double cre = re;
 				double cim = im;
 				Color col = new Color(0);
 				//int cl = 0;
+				
 				// iterate
+				double mag = 0;
+				int ite = 0;
+				
+				while (mag < 10 && ite < max_ite) {
+					double re_temp = re;
+					re = re_temp * re_temp - im * im + cre;
+					im = 2 * re_temp * im + cim;
+					
+					mag = re * re + im * im;
+					ite += 1;
+				}
+				
+				
+				if (ite < max_ite) {
+					
+					double log_zn = Math.log(mag) / 2d;
+					double nu = Math.log(log_zn / log2) / log2;
+					
+					double iteration = ite + 1 - nu;
+					
+					int r = linearInterpolation(mapping[(int) iteration % 15][0], mapping[((int) iteration + 1) % 15][0], iteration % 1);
+					int g = linearInterpolation(mapping[(int) iteration % 15][1], mapping[((int) iteration + 1) % 15][1], iteration % 1);
+					int b = linearInterpolation(mapping[(int) iteration % 15][2], mapping[((int) iteration + 1) % 15][2], iteration % 1);
+					
+					col = new Color(r, g, b);
+					
+					
+				}
+				
+				//https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring
+				
+				/*
 				for (int k = 0; k < max_ite; k++) {
 					double pre = re;
 					re = pre * pre - im * im + cre;
 					im = 2 * pre * im + cim;
+					
+					
 					double mag = re * re + im * im;
 					if (mag > 10) {
 						int ite = k % 15; //(k + fr) % 64;
@@ -124,7 +164,18 @@ public class Game extends Canvas implements Runnable {
 						break;
 					}
 				}
+				
+				*/
+				
+				
+				
 				img.setRGB(x, y, col.getRGB()); //img.setRGB(x, y, cl);
+				
+				
+				
+				
+				
+				
 			}
 		}
 	}
