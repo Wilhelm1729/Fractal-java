@@ -109,8 +109,8 @@ public class Game extends Canvas implements Runnable {
 				im += c_im;
 				double cre = re;
 				double cim = im;
-				//Color col = new Color(0);
-				int cl = 0;
+				Color col = new Color(0);
+				//int cl = 0;
 				// iterate
 				for (int k = 0; k < max_ite; k++) {
 					double pre = re;
@@ -118,13 +118,13 @@ public class Game extends Canvas implements Runnable {
 					im = 2 * pre * im + cim;
 					double mag = re * re + im * im;
 					if (mag > 10) {
-						int ite = (k + fr) % 64;
-						//col = new Color(mapping[ite][0], mapping[ite][1], mapping[ite][2]);
-						cl = (0xFF0011 & ((k + fr) * 0xFF11FF)) >> 5 & 0xFFFF00;
+						int ite = k % 15; //(k + fr) % 64;
+						col = new Color(mapping[ite][0], mapping[ite][1], mapping[ite][2]);
+						//cl = (0xFF0011 & ((k + fr) * 0xFF11FF)) >> 5 & 0xFFFF00;
 						break;
 					}
 				}
-				img.setRGB(x, y, cl); //img.setRGB(x, y, col.getRGB());
+				img.setRGB(x, y, col.getRGB()); //img.setRGB(x, y, cl);
 			}
 		}
 	}
